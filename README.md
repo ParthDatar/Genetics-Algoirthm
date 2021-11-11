@@ -1,1 +1,1 @@
-# Genetics-Algoirthm
+# Genetics-Algorithm

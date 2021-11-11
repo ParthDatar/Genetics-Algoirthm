@@ -5,22 +5,22 @@ import random as rn
 
 class organism:
 	def __init__(self, genes):
-		self.genome = [rn.randint(0, 6) for x in xrange(genes)]
+		self.genome = [rn.randint(0, 6) for x in range(genes)]
 		self.fit = 0
-	def fitness(self):
-		fs = [0 for x in xrange(100)]
-		for i in xrange(100):
+	def fitness(self, iterations, steps):
+		fs = [0 for x in range(iterations)]
+		for i in range(iterations):
 			rw = robby.World(10, 10)
-			for j in xrange(steps):
+			for j in range(steps):
 				perc = rw.getPerceptCode()
 				reward = rw.performAction(robby.POSSIBLE_ACTIONS[self.genome[perc]])
 				fs[i] += reward
-		return sum(fs)/100
+		return sum(fs)/iterations
 			
 
 class population:
 	def __init__(self, size, steps, crossover, mutation, generations):
-		self.orgs = [organism(243) for x in xrange(size)]
+		self.orgs = [organism(243) for x in range(size)]
 		self.size = size
 		self.steps = steps
 		self.mutation = mutation
@@ -28,7 +28,7 @@ class population:
 		self.generations = generations
 	
 	def sortByFitness(self): 
-		tuples = [(o.fitness(), o) for o in orgs] 
+		tuples = [(o.fitness(100, 200), o) for o in self.orgs] 
 		tuples.sort() 
 		sortedFitnessValues = [f for (f, o) in tuples] 
 		sortedOrgs = [o for (f, o) in tuples] 

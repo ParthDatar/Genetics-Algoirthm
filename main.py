@@ -6,7 +6,8 @@ import random as rn
 
 class organism:
 	def __init__(self):
-		self.genome = [rn.randint(0, 6) for x in range(243)]
+		self.genome = [rn.randint(0, 6) for x in xrange(243)]
 		self.score = 0
-		
+
+
 

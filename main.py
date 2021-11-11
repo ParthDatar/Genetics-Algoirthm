@@ -51,20 +51,54 @@ class organism:
 			
 
 class population:
-	def __init__(self, genome_size, size, steps, crossover, mutation, generations):
+	def __init__(self, genome_size, size, steps, crossover, mutation, generation_limit):
 		self.orgs = [organism(genome_size, crossover, mutation) for x in range(size)]
 		self.size = size
 		self.steps = steps
 		# self.mutation = mutation
 		# self.crossover = crossover
-		self.generations = generations
+		self.generation_limit = generation_limit
+		self.generation = 0
 	
-	def sortByFitness(self): 
+	def sort_by_fitness(self): 
 		tuples = [(o.fitness(100, self.steps), o) for o in self.orgs] 
 		tuples.sort() 
-		sortedFitnessValues = [f for (f, o) in tuples] 
-		sortedOrgs = [o for (f, o) in tuples] 
-		return sortedOrgs, sortedFitnessValues
+		sorted_fitness_values = [f for (f, o) in tuples] 
+		sorted_orgs = [o for (f, o) in tuples] 
+		return (sorted_orgs, sorted_fitness_values)
 
+	def mating(self):
+		if(self.generation < self.generation_limit):
+			sorting = self.sort_by_fitness()[0]
+			probs = [i/self.size for i in range(1, self.size+1)]
+			chances = [rn.random() for x in range(self.size)]
+			parents = [sorting[i] if (chances[i] <= probs[i]) else None for i in range(self.size)]
+			parents = filter(lambda x: x != None, parents)
+			if(len(parents) % 2 == 1):
+				parents.pop(0)
+			pairs = [(parents[i], parents[i+1]) for i in range(0, len(parents), 2)]
+			
+			num_children = len(parents)
+			children = []
+			
+			for (mom, dad) in pairs:
+				(son, daughter) = mom.reproduce(dad)
+				children.insert(0, daughter)
+				children.insert(0, son)
 
+			while(num_children < self.size):
+				new_probs = [i/len(parents) for i in range(1, len(parents)+1)]
+				new_chances = [rn.random() for x in range(len(parents))]
+				new_parents = [sorting[i] if (chances[i] <= probs[i]) else None for i in range(len(parents))]
+				new_parents = filter(lambda x: x != None, new_parents)
+				new_pairs = [(new_parents[i], new_parents[i+1]) for i in range(0, len(new_parents), 2)]
+				
+				for (mom, dad) in new_pairs:
+					(son, daughter) = mom.reproduce(dad)
+					num_children += 2
+				children.insert(0, daughter)
+				children.insert(0, son)
+			
+			if(num_children > self.size):
+				children[self.size:] = []
 

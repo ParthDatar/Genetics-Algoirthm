@@ -1,6 +1,9 @@
+from __future__ import print_function
+
 import robby 
 import random as rn
 
+rw = robby.World(10, 10) # Robby code expects a single global world, otherwise it keeps making new windows
 # rw.demo(rw.strategyM)
 
 class organism:
@@ -12,9 +15,12 @@ class organism:
 		self.genome_size = genome_size
 	
 	def fitness(self, iterations, steps):
+                global rw
 		fs = [0 for x in range(iterations)]
 		for i in range(iterations):
-			rw = robby.World(10, 10)
+                        # reset cans and robby position
+			rw.distributeCans()
+			rw.goto(0,0)
 			for j in range(steps):
 				perc = rw.getPerceptCode()
 				reward = rw.performAction(robby.POSSIBLE_ACTIONS[self.genome[perc]])
@@ -70,6 +76,16 @@ class population:
 	def mating(self):
 		if(self.generation < self.generation_limit):
 			sorting = self.sort_by_fitness()[0]
+			# Every 10 generations, print generation data
+			if (self.generation % 10 == 9):
+                                f = open('GAoutput.txt', 'w')
+                                print(self.generation, ' ', f) # generation number
+                                print(sum(sorted_fitness_values) / len(sorted_fitness_values), end=' ', file=f) # average fitness
+                                print(sorted_fitness_values[len(sorted_fitness_values)-1], end=' ', file=f) # fitness of best organism
+                                print(sorted_orgs[len(sorted_orgs)-1].genome, end='\n', file=f) # best organism
+                                
+			print('Now mating for generation ', self.generation)
+			
 			probs = [i/self.size for i in range(1, self.size+1)]
 			chances = [rn.random() for x in range(self.size)]
 			parents = [sorting[i] if (chances[i] <= probs[i]) else None for i in range(self.size)]
@@ -106,3 +122,18 @@ class population:
 			if(num_children > self.size):
 				children[self.size:] = []
 
+def main():
+        global rw
+        generations = 10
+        pop_size = 5
+        steps = 20
+        pop = population(243, pop_size, steps, -1, -1, generations)
+        # Turn off graphics
+        #rw.graphicsOff()
+        # Run algorithm for given generations
+        for i in range(generations):
+                pop.mating()
+        print('Genetic algorithm completed!')
+
+# Call main
+main()

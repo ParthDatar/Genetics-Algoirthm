@@ -77,14 +77,15 @@ class population:
 			if(len(parents) % 2 == 1):
 				parents.pop(0)
 			pairs = [(parents[i], parents[i+1]) for i in range(0, len(parents), 2)]
-			
+			pairs = pairs[::-1]
+
 			num_children = len(parents)
 			children = []
 			
 			for (mom, dad) in pairs:
 				(son, daughter) = mom.reproduce(dad)
-				children.insert(0, daughter)
-				children.insert(0, son)
+				children.append(son)
+				children.append(daughter)
 
 			while(num_children < self.size):
 				new_probs = [i/len(parents) for i in range(1, len(parents)+1)]
@@ -92,12 +93,15 @@ class population:
 				new_parents = [sorting[i] if (chances[i] <= probs[i]) else None for i in range(len(parents))]
 				new_parents = filter(lambda x: x != None, new_parents)
 				new_pairs = [(new_parents[i], new_parents[i+1]) for i in range(0, len(new_parents), 2)]
+				new_pairs = new_pairs[::-1]
 				
 				for (mom, dad) in new_pairs:
+					if(num_children >= self.size):
+						break
 					(son, daughter) = mom.reproduce(dad)
 					num_children += 2
-				children.insert(0, daughter)
-				children.insert(0, son)
+					children.append(son)
+					children.append(daughter)
 			
 			if(num_children > self.size):
 				children[self.size:] = []

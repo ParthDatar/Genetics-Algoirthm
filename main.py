@@ -104,10 +104,12 @@ class population:
 			num_children = len(children)
 
 			while(num_children < self.size):
-				new_probs = [float(i)/len(parents) for i in range(1, len(parents)+1)]
-				new_chances = [rn.random() for x in range(len(parents))]
-				new_parents = [sorting[i] if (chances[i] <= probs[i]) else None for i in range(len(parents))]
+				new_probs = [float(i)/self.size for i in range(1, self.size+1)]
+				new_chances = [rn.random() for x in range(self.size)]
+				new_parents = [sorting[i] if (new_chances[i] <= new_probs[i]) else None for i in range(self.size)]
 				new_parents = filter(lambda x: x != None, new_parents)
+				if(len(new_parents) % 2 == 1):
+                                        new_parents.pop(0)
 				new_pairs = [(new_parents[i], new_parents[i+1]) for i in range(0, len(new_parents) - 2, 2)]
 				new_pairs = new_pairs[::-1]
 				
@@ -130,9 +132,9 @@ def main():
         global rw, output
         rw = robby.World(10, 10) # Robby code expects a single global world, otherwise it keeps making new windows
         output = open('GAoutput.txt', 'w')
-        generations = 20
-        pop_size = 100
-        steps = 20
+        generations = 1000
+        pop_size = 10
+        steps = 100
         pop = population(243, pop_size, steps, -1, -1, generations)
         # Turn off graphics
         rw.graphicsOff()

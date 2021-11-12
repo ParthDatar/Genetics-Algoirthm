@@ -19,3 +19,4 @@ def plotGAoutput(filename="GAoutput.txt"):
     g(command)
 
 plotGAoutput()
+input("Press any key to continue")

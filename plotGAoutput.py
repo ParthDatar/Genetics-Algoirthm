@@ -18,3 +18,4 @@ def plotGAoutput(filename="GAoutput.txt"):
     command += ", '%s' using 1:3 title 'best fitness'" % filename
     g(command)
 
+plotGAoutput()

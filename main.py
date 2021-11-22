@@ -148,8 +148,8 @@ def main():
 	# Robby code expects a single global world, otherwise it keeps making new windows
 	rw = robby.World(10, 10)
 	output = open('GAoutput.txt', 'w')
-	generations = 1000
-	pop_size = 10
+	generations = 500
+	pop_size = 200
 	steps = 100
 	pop = population(243, pop_size, steps, 1, 0.01, generations)
 	# Turn off graphics

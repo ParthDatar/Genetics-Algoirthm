@@ -53,8 +53,7 @@ class organism:
 
 		mut_chance = [rn.random() for x in range(self.genome_size)]
 		son.genome = [son.genome[i] if (mut_chance[i] > self.mutation_rate) else rn.randint(0, 6) for i in range(self.genome_size)]
-		daughter.genome = [daughter.genome[i] if (
-			mut_chance[i] > self.mutation_rate) else rn.randint(0, 6) for i in range(self.genome_size)]
+		daughter.genome = [daughter.genome[i] if (mut_chance[i] > self.mutation_rate) else rn.randint(0, 6) for i in range(self.genome_size)]
 
 		return (son, daughter)
 
@@ -79,7 +78,7 @@ class population:
 
 	def mating(self):
 		global output
-		if(self.generation < self.generation_limit):
+		if(self.generation <= self.generation_limit):
 			(sorting, sorted_fitness) = self.sort_by_fitness()
 			# Every 10 generations, print generation data
 			if (self.generation % 10 == 0 or self.generation == 1):
@@ -113,7 +112,6 @@ class population:
 
 			x = len(pairs)
 			a = -x + 100
-			b = 2*x - 100
 
 			children = []
 
@@ -130,35 +128,6 @@ class population:
 					children.append(son)
 					children.append(daughter)
 
-			# num_children = len(children)
-
-			# while(num_children < self.size):
-			# 	new_probs = [float(i)/self.size for i in range(1, self.size+1)]
-			# 	new_chances = [rn.random() for x in range(self.size)]
-			# 	new_parents = [sorting[i] if (
-			# 		new_chances[i] <= new_probs[i]) else None for i in range(self.size)]
-			# 	new_parents = filter(lambda x: x != None, new_parents)
-			# 	if(len(new_parents) % 2 == 1):
-			# 		new_parents.pop(0)
-			# 	new_pairs = [(new_parents[i], new_parents[i+1])
-			# 				 for i in range(0, len(new_parents) - 2, 2)]
-			# 	new_pairs = new_pairs[::-1]
-
-			# 	for (mom, dad) in new_pairs:
-			# 		if(num_children >= self.size):
-			# 			break
-			# 		(son, daughter) = mom.reproduce(dad)
-			# 		num_children += 2
-			# 		children.append(son)
-			# 		children.append(daughter)
-
-			# if(num_children > self.size):
-			# 	children[self.size:] = []
-			# increment generation
-			# # print(len(children))
-			# # print(a)
-			# # print(b)
-			# # print(x)
 			self.orgs = children
 			self.generation = self.generation + 1
 
@@ -168,11 +137,11 @@ def main():
 	# Robby code expects a single global world, otherwise it keeps making new windows
 	rw = robby.World(10, 10)
 	# output = open('GAoutput.txt', 'w')
-	output = open('GAoutput_Local.txt', 'a')
+	output = open('GAoutput.txt', 'a')
 	generations = 500
 	pop_size = 200
 	steps = 100
-	pop = population(243, pop_size, steps, 1, 0.01, generations)
+	pop = population(243, pop_size, steps, 1, 0.005, generations)
 	# Turn off graphics
 	rw.graphicsOff()
 	# Run algorithm for given generations

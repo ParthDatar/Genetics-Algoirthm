@@ -52,8 +52,7 @@ class organism:
 				daughter.genome[j] = partner.genome[j]
 
 		mut_chance = [rn.random() for x in range(self.genome_size)]
-		son.genome = [son.genome[i] if (mut_chance[i] > self.mutation_rate) else rn.randint(
-			0, 6) for i in range(self.genome_size)]
+		son.genome = [son.genome[i] if (mut_chance[i] > self.mutation_rate) else rn.randint(0, 6) for i in range(self.genome_size)]
 		daughter.genome = [daughter.genome[i] if (
 			mut_chance[i] > self.mutation_rate) else rn.randint(0, 6) for i in range(self.genome_size)]
 
@@ -69,7 +68,7 @@ class population:
 		# self.mutation = mutation
 		# self.crossover = crossover
 		self.generation_limit = generation_limit
-		self.generation = 0
+		self.generation = 1
 
 	def sort_by_fitness(self):
 		tuples = [(o.fitness(100, self.steps), o) for o in self.orgs]
@@ -83,62 +82,83 @@ class population:
 		if(self.generation < self.generation_limit):
 			(sorting, sorted_fitness) = self.sort_by_fitness()
 			# Every 10 generations, print generation data
-			if (self.generation % 10 == 9):
+			if (self.generation % 10 == 0 or self.generation == 1):
 				# generation number
 				print(self.generation, end=' ', file=output)
 				print(sum(sorted_fitness) / len(sorted_fitness),
 					  end=' ', file=output)  # average fitness
 				# fitness of best organism
-				print(sorted_fitness[len(sorted_fitness)-1],
-					  end=' ', file=output)
-				print(''.join([str(elem) for elem in sorting[0].genome]),
-					  end='\n', file=output)  # best organism
+				print(sorted_fitness[-1], end=' ', file=output)
+				print(''.join([str(elem) for elem in sorting[0].genome]), end='\n', file=output)  # best organism
 
 			print('Now mating for generation ', self.generation)
 
 			probs = [float(i)/self.size for i in range(1, self.size+1)]
 			chances = [rn.random() for x in range(self.size)]
-			parents = [sorting[i] if (
-				chances[i] <= probs[i]) else None for i in range(self.size)]
+			parents = [sorting[i] if (chances[i] <= probs[i]) else None for i in range(self.size)]
 			parents = filter(lambda x: x != None, parents)
+			
+			while(len(parents) < 100):
+				probs = [float(i)/self.size for i in range(1, self.size+1)]
+				chances = [rn.random() for x in range(self.size)]
+				parents = [sorting[i] if (
+					chances[i] <= probs[i]) else None for i in range(self.size)]
+				parents = filter(lambda x: x != None, parents)
+			
 			if(len(parents) % 2 == 1):
 				parents.pop(0)
 			pairs = [(parents[i], parents[i+1])
-					 for i in range(0, len(parents) - 2, 2)]
+					 for i in range(0, len(parents) - 1, 2)]
 			pairs = pairs[::-1]
+
+			x = len(pairs)
+			a = -x + 100
+			b = 2*x - 100
 
 			children = []
 
-			for (mom, dad) in pairs:
-				(son, daughter) = mom.reproduce(dad)
-				children.append(son)
-				children.append(daughter)
-
-			num_children = len(children)
-
-			while(num_children < self.size):
-				new_probs = [float(i)/self.size for i in range(1, self.size+1)]
-				new_chances = [rn.random() for x in range(self.size)]
-				new_parents = [sorting[i] if (
-					new_chances[i] <= new_probs[i]) else None for i in range(self.size)]
-				new_parents = filter(lambda x: x != None, new_parents)
-				if(len(new_parents) % 2 == 1):
-					new_parents.pop(0)
-				new_pairs = [(new_parents[i], new_parents[i+1])
-							 for i in range(0, len(new_parents) - 2, 2)]
-				new_pairs = new_pairs[::-1]
-
-				for (mom, dad) in new_pairs:
-					if(num_children >= self.size):
-						break
+			for count, (mom, dad) in enumerate(pairs):
+				if(count < a):
 					(son, daughter) = mom.reproduce(dad)
-					num_children += 2
+					children.append(son)
+					children.append(daughter)
+					(second_son, second_daughter) = dad.reproduce(mom)
+					children.append(second_son)
+					children.append(second_daughter)
+				else:
+					(son, daughter) = mom.reproduce(dad)
 					children.append(son)
 					children.append(daughter)
 
-			if(num_children > self.size):
-				children[self.size:] = []
+			# num_children = len(children)
+
+			# while(num_children < self.size):
+			# 	new_probs = [float(i)/self.size for i in range(1, self.size+1)]
+			# 	new_chances = [rn.random() for x in range(self.size)]
+			# 	new_parents = [sorting[i] if (
+			# 		new_chances[i] <= new_probs[i]) else None for i in range(self.size)]
+			# 	new_parents = filter(lambda x: x != None, new_parents)
+			# 	if(len(new_parents) % 2 == 1):
+			# 		new_parents.pop(0)
+			# 	new_pairs = [(new_parents[i], new_parents[i+1])
+			# 				 for i in range(0, len(new_parents) - 2, 2)]
+			# 	new_pairs = new_pairs[::-1]
+
+			# 	for (mom, dad) in new_pairs:
+			# 		if(num_children >= self.size):
+			# 			break
+			# 		(son, daughter) = mom.reproduce(dad)
+			# 		num_children += 2
+			# 		children.append(son)
+			# 		children.append(daughter)
+
+			# if(num_children > self.size):
+			# 	children[self.size:] = []
 			# increment generation
+			# # print(len(children))
+			# # print(a)
+			# # print(b)
+			# # print(x)
 			self.orgs = children
 			self.generation = self.generation + 1
 
@@ -147,7 +167,8 @@ def main():
 	global rw, output
 	# Robby code expects a single global world, otherwise it keeps making new windows
 	rw = robby.World(10, 10)
-	output = open('GAoutput.txt', 'w')
+	# output = open('GAoutput.txt', 'w')
+	output = open('GAoutput_Local.txt', 'a')
 	generations = 500
 	pop_size = 200
 	steps = 100
